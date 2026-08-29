@@ -1,1 +1,3 @@
-export default function HistoryQuizApp() { return <div>HistoryQuiz placeholder</div>; }
+export default function HistoryQuizApp() {
+	return <div>HistoryQuiz placeholder</div>;
+}

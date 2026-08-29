@@ -13,14 +13,17 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
-		"@rebuildup/my-web-tools-ui": "link:../../ui/src",
+		"@rebuildup/my-web-tools-ui": "file:../my-web-2025/external/ui",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.0",
+		"@types/react": "^19.2.18",
+		"@types/react-dom": "^19.2.5",
 		"@vitejs/plugin-react": "^4.3.4",
 		"typescript": "~5.6.2",
 		"vite": "^6.0.5"
-	}
+	},
+	"trustedDependencies": ["@biomejs/biome"]
 }

@@ -1,5 +1,42 @@
+# dependencies
 node_modules/
-.next/
+
+# build outputs
 dist/
+build/
+
+# test / coverage
+coverage/
+.tmp/
+
+# reference repos (gitignored per project policy)
+.reference/
+
+# env files (real values)
+.env
+.env.development
+.env.production
+!.env.example
+!.env.development.example
+!.env.production.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# editor
 .vscode/
+.idea/
+*.swp
+
+# logs
 *.log
+
+# vite cache
+.vite/
+
+# typescript incremental build
+tsconfig.tsbuildinfo
+
+# bun
+bun.lockb
