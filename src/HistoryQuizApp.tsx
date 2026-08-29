@@ -34,7 +34,7 @@ export default function HistoryQuizApp() {
 				tooltip.className = "ans-tooltip";
 				const ans = input.getAttribute("data-ans");
 				if (ans) {
-					tooltip.innerText = ans.split("|")[0];
+					tooltip.innerText = ans.split("|")[0] ?? "";
 				}
 				wrapper.appendChild(tooltip);
 
@@ -50,7 +50,7 @@ export default function HistoryQuizApp() {
 							) as HTMLInputElement[];
 							const idx = sectionInputs.indexOf(input);
 							if (idx >= 0 && idx < sectionInputs.length - 1) {
-								sectionInputs[idx + 1].focus();
+								sectionInputs[idx + 1]?.focus();
 							}
 						}
 					}
