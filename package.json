@@ -10,7 +10,8 @@
 		"lint": "biome check .",
 		"test": "bun run lint && bun run build",
 		"format": "biome format . --write",
-		"preview": "vite preview"
+		"preview": "vite preview",
+		"scripts:setup-branch-protection": "bash scripts/setup-branch-protection.sh"
 	},
 	"dependencies": {
 		"@rebuildup/my-web-tools-ui": "file:../my-web-2025/external/ui",

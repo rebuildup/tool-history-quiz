@@ -1,0 +1,21 @@
+# CODEOWNERS
+#
+# Each line is a file pattern followed by one or more owners.
+# When a PR touches a matching path, GitHub automatically requests
+# review from the listed owners and blocks merge until at least
+# one required approval is recorded.
+#
+# Adjust the GitHub handle(s) below to match the actual maintainers
+# of this repository. Branch protection requires at least one
+# approval from a matching owner before merge to `main`.
+#
+# Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owner for everything in this repository.
+/*    @rebuildup
+
+# CI / agent configuration requires explicit review before merge.
+/.github/    @rebuildup
+/AGENTS.md   @rebuildup
+/CLAUDE.md   @rebuildup
+/docs/adr/   @rebuildup
