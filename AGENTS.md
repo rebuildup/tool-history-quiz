@@ -28,15 +28,18 @@
 
 ## Branch / PR workflow
 
-`main` は branch protection で保護されている。すべての変更は Pull request 経由で取り込む。
+`main` は released/integrated state、`release-x-y-z` は current release integration line とする。
 
-- 作業は必ず feature branch で行う (例: `chore/<short-desc>`, `feat/<short-desc>`, `fix/<short-desc>`)。
-- 直接 push to `main` は禁止。`enforce_admins: true` のため admin も不可。
-- force push / branch deletion / merge commit も禁止 (linear history 強制)。
-- PR は CODEOWNERS review + `quality-gate` success + 全 conversation resolve が揃って merge 可。
-- 同一ファイルへの並行編集は禁止。所有権単位で分割するか phase を直列化する。
-- subagent / team mechanism が worktree を必須とする場合は使用しない。worktree 不要の subagent mechanism を選択する。
-- branch protection の詳細は `docs/branch-protection.md` を参照。適用手順は `bun run scripts:setup-branch-protection` (要 `gh` 認証 + admin 権限)。
+- durable implementation work は GitHub Issue。ticket branch は Issue number only を標準とする。
+- independent ticket PR は current `release-x-y-z` を target にする。
+- release branch に meaningful difference が入ったら Draft release PR (`release-x-y-z -> main`) を維持する。
+- `main` への normal integration は current release branch からの release PR だけ。
+- repository landing method は **merge commit only**。squash / rebase merge は使用しない。
+- approval count / CODEOWNERS review は merge requirement にしない。CODEOWNERS は ownership routing metadata として保持する。
+- required CI と全 review conversation resolve を merge gate とする。
+- 直接 push / force push / main deletion は禁止。
+- parallel work は ownership / mutable state を分離し、必要なら worktree / sandbox を使う。worktree 自体を runtime isolation proof にはしない。
+- branch protection の詳細は `docs/branch-protection.md`。適用手順は `bun run scripts:setup-branch-protection`。
 
 ## Validation entry point
 
@@ -49,7 +52,7 @@ bun run typecheck
 bun run build
 ```
 
-CI workflow は `.github/workflows/ci.yml`。local と CI で同じ `bun run` script を呼び出す。CI は PR ごとに起動し、superseded な commit の run は自動 cancel される。
+CI workflow は `.github/workflows/ci.yml`。local と CI で同じ `bun run` script を呼び出す。ticket PR / release PR の双方で起動し、superseded な commit の run は自動 cancel される。
 
 ## Design / approval gate
 
@@ -76,3 +79,10 @@ CI workflow は `.github/workflows/ci.yml`。local と CI で同じ `bun run` sc
 3. 親 monorepo (`my-web-2025`) の仕様 (embed 契約の確認)
 4. installed dependency の型 / schema
 5. official documentation (React 19 / Vite 6 / Bun / Biome)
+
+## Constitution / operating profile
+
+- 最上位 contract: [`constitution/CONSTITUTION.md`](constitution/CONSTITUTION.md)
+- current Operating Model: [`organization/profiles/release-driven-solo.md`](organization/profiles/release-driven-solo.md)
+- host embed / Bun / build validation に関する project-specific decisions は、Constitution と両立する限り保持する。
+- project-init operational Skills は current upstream を `bunx skills` + `skills-lock.json` で project-local に継続更新する。
