@@ -2,7 +2,6 @@ name: ci
 
 on:
   pull_request:
-    branches: [main]
 
 # Cancel superseded PR runs so the latest commit's checks are the only
 # ones that matter. Merge queue / main branch runs are not cancelled.
