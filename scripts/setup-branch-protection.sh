@@ -17,16 +17,12 @@
 #     .github/workflows/ci.yml) must be reported by GitHub as
 #     "success" before merge.
 #     strict = true  → branches must be up to date before merge.
-#   - required_pull_request_reviews:
-#       required_approving_review_count = 1
-#       dismiss_stale_reviews = true
-#       require_code_owner_reviews = true
-#       require_last_push_approval = true
+#   - required_pull_request_reviews = null (solo repo: approval is not a merge gate)
 #   - enforce_admins = true
 #   - restrictions = none (any signed-in user may open a PR)
 #   - block_force_pushes = true
 #   - block_deletions = true
-#   - required_linear_history = true
+#   - required_linear_history = false (merge commits are required)
 #   - required_conversation_resolution = true
 #   - allow_fork_syncing = false
 #   - lock_branch = false
@@ -35,6 +31,15 @@ set -euo pipefail
 
 BRANCH="main"
 REPO="$(gh repo view --json nameWithOwner -q '.nameWithOwner')"
+
+echo "Applying repository merge settings to ${REPO} ..."
+gh api \
+    --method PATCH \
+    -H "Accept: application/vnd.github+json" \
+    "/repos/${REPO}" \
+    -f allow_merge_commit=true \
+    -f allow_squash_merge=false \
+    -f allow_rebase_merge=false >/dev/null
 
 echo "Applying branch protection to ${REPO}:${BRANCH} ..."
 
@@ -49,16 +54,11 @@ gh api \
         "contexts": ["quality-gate"]
     },
     "enforce_admins": true,
-    "required_pull_request_reviews": {
-        "dismiss_stale_reviews": true,
-        "require_code_owner_reviews": true,
-        "required_approving_review_count": 1,
-        "require_last_push_approval": true
-    },
+    "required_pull_request_reviews": null,
     "restrictions": null,
     "block_force_pushes": true,
     "block_deletions": true,
-    "required_linear_history": true,
+    "required_linear_history": false,
     "required_conversation_resolution": true,
     "allow_fork_syncing": false,
     "lock_branch": false
