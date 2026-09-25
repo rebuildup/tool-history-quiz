@@ -1,32 +1,42 @@
 # Branch Protection
 
-`main` は保護されています。すべての変更は Pull request 経由で main に取り込まれます。
+`main` は released / integrated state として保護する。通常の実装変更は ticket PR で current `release-x-y-z` に入り、main への normal integration は release PR だけが行う。
 
 ## 必要な gate
 
-- `quality-gate` (`.github/workflows/ci.yml` の job) が success であること。
-  - 含まれる step: lint (`bun run lint`) → typecheck (`bun run typecheck`) → build (`bun run build`)。
-- CODEOWNERS に登録された reviewer から 1 名以上の approval があること。
-  - `.github/CODEOWNERS` を参照。
-- 直近の push 以降の review conversation がすべて resolve されていること。
+- `quality-gate` が success であること。
+- review conversation がすべて resolve されていること。
+- approval count / CODEOWNERS approval は required gate にしない。
+- release PR は current `release-x-y-z` から `main` へ向ける。
+
+## Merge method
+
+- merge commit only。
+- squash merge / rebase merge は repository setting で無効化する。
+- branch-local rebase は stacked branch maintenance 等の branch mechanics として別扱い。
 
 ## 禁止操作
 
-- 直接 push to `main` (admin も不可、`enforce_admins: true`)。
+- 直接 push to `main`。
 - force push。
 - `main` の削除。
-- merge commit (linear history 強制)。
+- release branch 以外から `main` へ normal integration すること。
 
 ## 適用方法
 
-1. `gh auth login` で GitHub CLI を認証する (`repo` scope が必要)。
-2. admin 権限を持つアカウントで `bun run scripts:setup-branch-protection` (または `bash scripts/setup-branch-protection.sh`) を実行する。
-3. 結果を確認する: `gh api /repos/<owner>/<repo>/branches/main/protection`。
+1. `gh auth login` で GitHub CLI を認証する。
+2. admin 権限を持つアカウントで `bun run scripts:setup-branch-protection` を実行する。
+3. repository merge settings と branch protection を確認する。
 
-初回 setup 後、再実行は冪等 (同じ payload で上書き)。
+このscriptは次を揃える:
 
-## 必要な required status check
+- `allow_merge_commit=true`
+- `allow_squash_merge=false`
+- `allow_rebase_merge=false`
+- required check: `quality-gate`
+- required approving reviews: none
+- required conversation resolution: true
+- force push / deletion: blocked
+- linear-history requirement: false
 
-GitHub は **job name** を required check として識別する。本 repo の `.github/workflows/ci.yml` の job は `quality-gate` のみ。step 名ではなく job 名を使う点に注意。
-
-CI を変更して job を rename / split する場合、`scripts/setup-branch-protection.sh` の `contexts` も同期して更新する。
+CODEOWNERS は ownership routing metadata として残すが、solo development の approval gate にはしない。
