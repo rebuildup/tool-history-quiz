@@ -19,7 +19,17 @@ bun run typecheck   # TypeScript
 bun run preview     # standalone shell preview
 ```
 
-`@rebuildup/my-web-tools-ui` は `file:../my-web-2025/external/ui` で参照する。親 monorepo が sibling として存在しない環境では `bun install` が失敗するため、その場合は `package.json` の path を環境に合わせて修正する。
+sibling monorepo (`my-web-2025`) が存在しない環境でも `bun install` が通る (host へ依存する `file:` 参照はない)。
+
+## Standalone static artifact
+
+`bun run build` の成果物 (`dist/`) は host (`my-web-2026`) が `/tools/history-quiz/app/` 配下に静的配信し、sandbox iframe に読み込むためのものである。
+
+- `vite.config.ts` の `base: "./"` により `dist/index.html` の asset 参照は相対 (`./assets/...`) になる。
+- クイズ本文は `public/history-quiz.html` が正本であり、`dist/history-quiz.html` としてそのまま出力される。
+- 最終段落の host 配信サーバは `Access-Control-Allow-Origin: *` を返すこと (sandbox iframe の opaque origin 対策)。
+
+詳細は `docs/adr/0003-standalone-static-build.md` を参照。
 
 ## Validation
 

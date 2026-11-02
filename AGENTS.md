@@ -20,7 +20,7 @@
 - package manager: Bun (`bun` / `bun run` / `bunx`)。
 - build: Vite 6 (`vite` / `vite build` / `vite preview`)。
 - 主要 dependency: React 19.x, React DOM 19.x。
-- 共有 UI primitives: `@rebuildup/my-web-tools-ui` (parent monorepo `external/ui/` を file link)。
+- 共有 UI primitives: 現時点なし。host へ依存する `file:` 参照は持たない (fresh clone / CI で `bun install` が通ることを優先)。
 - formatter + linter: Biome (`bunx @biomejs/biome`)。
 - type-check: TypeScript (`bunx tsc --noEmit` または `tsc -b`)。
 
