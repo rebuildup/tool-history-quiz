@@ -5,7 +5,9 @@
 			"src/**",
 			"*.ts",
 			"*.tsx",
-			"*.json",
+			"package.json",
+			"tsconfig.json",
+			"biome.json",
 			"!src/**/*.test.ts",
 			"!src/**/*.test.tsx"
 		]
