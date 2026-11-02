@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歴史B 演習プリント【セクション別採点版】</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --text-color: #222;
+            --accent-color: #2c3e50;
+            --correct-color: #27ae60;
+            --incorrect-color: #c0392b;
+            --block-bg: #ffffff;
+        }
+
+        body {
+            font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 2.2;
+            margin: 0;
+            padding: 20px;
+            padding-top: 70px;
+            /* Navbar space */
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            margin-bottom: 80px;
+        }
+
+        /* Typography */
+        h1.sheet-title {
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 1.5em;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        h2.main-header {
+            font-size: 1.3em;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            color: #444;
+            font-family: sans-serif;
+            border-left: 5px solid #888;
+            padding-left: 10px;
+        }
+
+        /* Quiz Section Block */
+        .quiz-section {
+            background: var(--block-bg);
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e1e4e8;
+        }
+
+        .quiz-section h3 {
+            font-family: sans-serif;
+            margin-top: 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 1.2em;
+            color: var(--accent-color);
+        }
+
+        p {
+            margin-bottom: 1.5em;
+            text-align: justify;
+        }
+
+        /* Input Styling */
+        .input-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 0 2px;
+        }
+
+        input.blank {
+            font-family: sans-serif;
+            font-size: 15px;
+            border: none;
+            border-bottom: 1px solid #333;
+            background-color: #f9f9f9;
+            text-align: center;
+            padding: 0 4px;
+            font-weight: bold;
+            color: var(--accent-color);
+            transition: all 0.2s;
+            border-radius: 3px 3px 0 0;
+        }
+
+        input.blank:focus {
+            outline: none;
+            background-color: #eaf6ff;
+            border-bottom: 2px solid #3498db;
+        }
+
+        input.blank.correct {
+            border-bottom: 2px solid var(--correct-color);
+            background-color: #e8f8f5;
+            color: #145a32;
+        }
+
+        input.blank.incorrect {
+            border-bottom: 2px solid var(--incorrect-color);
+            background-color: #fdedec;
+        }
+
+        /* Tooltip */
+        .ans-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--incorrect-color);
+            color: white;
+            padding: 4px 8px;
+            font-size: 12px;
+            border-radius: 4px;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            z-index: 10;
+            font-family: sans-serif;
+            margin-bottom: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .ans-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--incorrect-color) transparent transparent transparent;
+        }
+
+        .input-wrapper.show-ans .ans-tooltip {
+            opacity: 1;
+        }
+
+        /* Section Controls */
+        .section-controls {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #ddd;
+            text-align: right;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-mini {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: sans-serif;
+            transition: background 0.2s;
+        }
+
+        .btn-check {
+            background: var(--correct-color);
+            color: white;
+        }
+
+        .btn-check:hover {
+            background: #219150;
+        }
+
+        .btn-ans {
+            background: var(--incorrect-color);
+            color: white;
+        }
+
+        .btn-ans:hover {
+            background: #a93226;
+        }
+
+        .btn-reset {
+            background: #ecf0f1;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+        .btn-reset:hover {
+            background: #bdc3c7;
+        }
+
+        /* Navigation Bar */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 10px 0;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid #ccc;
+            padding: 8px 16px;
+            margin: 0 5px;
+            cursor: pointer;
+            border-radius: 20px;
+            font-weight: bold;
+            color: #555;
+            font-family: sans-serif;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .nav-btn.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .sheet {
+            display: none;
+        }
+
+        .sheet.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="nav-bar">
+        <button class="nav-btn active" onclick="switchSheet(1)">第1回</button>
+        <button class="nav-btn" onclick="switchSheet(2)">第2回</button>
+        <button class="nav-btn" onclick="switchSheet(3)">第3回</button>
+        <button class="nav-btn" onclick="switchSheet(4)">第4回</button>
+        <button class="nav-btn" onclick="switchSheet(5)">第5回</button>
+    </div>
+
+    <div id="sheet-1" class="sheet container active">
+        <h2 class="sheet-title">第1回 第二次世界大戦の終焉</h2>
+        <h2 class="main-header">第二次世界大戦の終焉</h2>
+
+        <div class="quiz-section">
+            <h3>枢軸国の敗北・日本の敗戦</h3>
+            <p>
+                日本は開戦後半年間で、香港、マレー半島、シンガポール、オランダ領東インド、フィリピン、ビルマを支配下におさめ、「<input class="blank" data-ans="大東亜共栄圏"
+                    style="width:360px">」を唱えた.日本の東南アジア支配は、欧米諸国の植民地支配を破壊したが、「<input class="blank" data-ans="アジア解放"
+                    style="width:100px">」の名目とは裏腹に、新たな支配者として軍政を敷き、資源の収奪や日本語教育の強制などを推し進め、やがて各地で反日抵抗運動に直面した.資源や工業生産力などアメリカとの国力差も歴然で、1942年6月の<input
+                    class="blank" data-ans="ミッドウェー" style="width:100px">海戦で大敗すると、日本は戦争の主導権を失った.
+            </p>
+            <p>
+                1942年後半から連合国軍は総反撃に移り、1943年初めにソ連軍は<input class="blank" data-ans="スターリングラード"
+                    style="width:140px">の戦いでドイツ軍を撃破し、以後ドイツは敗退を重ねた.イタリアでは、1943年7月に連合国軍が<input class="blank"
+                    data-ans="シチリア島" style="width:100px">に上陸すると、<input class="blank" data-ans="ムッソリーニ"
+                    style="width:100px">は失脚し9月にイタリア新政府が無条件降伏した.
+            </p>
+            <p>
+                1943年11月に<input class="blank" data-ans="ルーズヴェルト" style="width:100px">、<input class="blank"
+                    data-ans="チャーチル" style="width:90px">、<input class="blank" data-ans="スターリン"
+                    style="width:90px">の<input class="blank" data-ans="テヘラン会議"
+                    style="width:120px">において、連合国軍の北フランス上陸が協議され、1944年6月にアイゼンハワー指揮下の連合国軍が<input class="blank"
+                    data-ans="ノルマンディー" style="width:120px">に上陸した.連合国軍は8月に<input class="blank" data-ans="パリ"
+                    style="width:60px">を解放し、並行してソ連軍も東欧諸国に進軍し、ドイツ軍を駆逐していった.
+            </p>
+            <p>
+                1945年2月に<input class="blank" data-ans="ルーズヴェルト" style="width:100px">、<input class="blank"
+                    data-ans="チャーチル" style="width:90px">、<input class="blank" data-ans="スターリン"
+                    style="width:90px">の<input class="blank" data-ans="ヤルタ会談"
+                    style="width:100px">において、ドイツ敗戦後の共同管理と戦争犯罪の裁判、国際連合設立準備と安保理の権限などで合意した.秘密協定（<input class="blank"
+                    data-ans="ヤルタ協定" style="width:100px">）としてドイツ降伏後3ヶ月以内のソ連参戦が取り決められ、その引き換えに<input class="blank"
+                    data-ans="対日" style="width:60px">参戦が取り決められ、その引き換えに<input class="blank" data-ans="ルーズヴェルト"
+                    style="width:100px">は<input class="blank" data-ans="南樺太" style="width:80px">と<input class="blank"
+                    data-ans="千島列島" style="width:80px">のソ連領有を認めた.
+            </p>
+            <p>
+                空襲で多くの都市や交通網が破壊されたドイツは1945年に入ると総崩れとなり、4月30日に<input class="blank" data-ans="ヒトラー"
+                    style="width:80px">が自殺し、5月2日に<input class="blank" data-ans="ベルリン"
+                    style="width:80px">が陥落した.5月7日にドイツは無条件降伏し、ヨーロッパでの戦争が終結した.
+            </p>
+            <p>
+                日本は太平洋地域で敗退を重ね、1944年7月に<input class="blank" data-ans="サイパン島" style="width:100px">が陥落すると、<input
+                    class="blank" data-ans="本土空襲" style="width:100px">が次第に激化した.1945年4月にはアメリカ軍が<input class="blank"
+                    data-ans="沖縄本島" style="width:100px">に上陸し、6月23日に日本軍の組織的抵抗が終了し、アメリカ軍に占領された.
+            </p>
+            <p>
+                1945年7月から8月にかけて、<input class="blank" data-ans="トルーマン" style="width:90px">、<input class="blank"
+                    data-ans="チャーチル" style="width:90px">、<input class="blank" data-ans="スターリン"
+                    style="width:90px">による<input class="blank" data-ans="ポツダム会談"
+                    style="width:120px">において、日本に対する降伏勧告宣言である<input class="blank" data-ans="ポツダム宣言"
+                    style="width:140px">を発表した.日本はこれを黙殺したが、アメリカは8月6日に<input class="blank" data-ans="広島"
+                    style="width:60px">、8月9日には<input class="blank" data-ans="長崎" style="width:60px">に原子爆弾を投下した.
+            </p>
+            <p>
+                ソ連は<input class="blank" data-ans="ヤルタ協定" style="width:100px">に基づき、<input class="blank"
+                    data-ans="日粗中立条約|日ソ中立条約" style="width:120px">の破棄を通告して宣戦し、中国東北地方、朝鮮、南樺太、千島列島に侵攻した.
+            </p>
+            <p>
+                1945年8月14日に日本は御前会議を開き<input class="blank" data-ans="ポツダム宣言"
+                    style="width:140px">受諾を決定し、15日に天皇は玉音放送で国民に終戦を告げた.9月2日に降伏文書が調印され、<input class="blank"
+                    data-ans="第二次世界大戦" style="width:140px">が終結した.
+            </p>
+
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <div class="quiz-section">
+            <h3>第二次世界大戦の結果</h3>
+            <p>
+                <input class="blank" data-ans="第二次世界大戦" style="width:140px">は、異なる<input class="blank" data-ans="政治"
+                    style="width:60px">体制、<input class="blank" data-ans="社会"
+                    style="width:60px">体制間の優劣を競うという、第一次世界大戦にない特徴を帯びた.<input class="blank" data-ans="ファシズム"
+                    style="width:100px">に対抗して<input class="blank" data-ans="民主主義"
+                    style="width:100px">の優位を標榜する連合国が勝利したことは、戦後世界で<input class="blank" data-ans="民主主義"
+                    style="width:100px">が拡大する重要な一歩となった.
+            </p>
+            <p>
+                連合国陣営の中で、アメリカとならんでソ連が中心的な役割を果たしたことから、戦後の国際政治では両国を盟主とする<input class="blank" data-ans="資本主義"
+                    style="width:300px">陣営と<input class="blank" data-ans="社会主義" style="width:240px">陣営の争い（いわゆる<input
+                    class="blank" data-ans="冷戦" style="width:120px">構造）が展開することとなった.
+            </p>
+            <p>
+                ヨーロッパは戦場となったことに加え、植民地支配体制も弱体化し、国際政治上の比重を大きく低下させた.一方で、中国をはじめとするアジア諸地域は、欧米諸国や日本の支配・圧力に抵抗するなかで、<input
+                    class="blank" data-ans="ナショナリズム" style="width:120px">を高め、戦後の国際政治で自己の立場を強力に主張することとなった.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <div class="quiz-section">
+            <h3>北方領土問題との関係</h3>
+            <p>
+                日本は、<input class="blank" data-ans="韓国" style="width:60px">との間に<input class="blank" data-ans="独島"
+                    style="width:60px">（<input class="blank" data-ans="竹島" style="width:60px">）の帰属をめぐる問題を、<input
+                    class="blank" data-ans="ロシア" style="width:60px">との間に<input class="blank" data-ans="歯舞群島"
+                    style="width:80px">、<input class="blank" data-ans="色丹島" style="width:80px">、国<input class="blank"
+                    data-ans="後島" style="width:60px">、<input class="blank" data-ans="択捉島"
+                    style="width:80px">の帰属をめぐる<input class="blank" data-ans="北方領土"
+                    style="width:100px">問題を、中国と台湾との間に<input class="blank" data-ans="尖閣諸島"
+                    style="width:100px">の領有権をめぐる対立を抱えている.
+            </p>
+            <p>
+                日本は第二次世界大戦に敗れ、1951年に調印された<input class="blank" data-ans="サンフランシスコ平和条約" style="width:200px">において<input
+                    class="blank" data-ans="千島列島" style="width:100px">の領有権を放棄した.しかし<input class="blank" data-ans="北方四島"
+                    style="width:100px">および<input class="blank" data-ans="南樺太" style="width:80px">は歴史的にロシアの勢力が<input
+                    class="blank" data-ans="千島列島" style="width:100px">より南に及んだことが一度もなく、日本固有の領土であるとして、<input class="blank"
+                    data-ans="千島列島" style="width:100px">には含まれないとの立場である.一方ロシアは、旧ソ連が1945年調印の<input class="blank"
+                    data-ans="ヤルタ協定" style="width:100px">を通して<input class="blank" data-ans="北方領土"
+                    style="width:100px">を獲得し、領有権を主張している.
+            </p>
+            <p>
+                1956年に調印された<input class="blank" data-ans="歯舞群島" style="width:120px">,<input class="blank" data-ans="色丹島"
+                    style="width:100px">の二島については「日ソ間に平和条約が締結された後に現実に引き渡されるものとする」という<input class="blank"
+                    data-ans="日ソ共同宣言" style="width:140px">の立場を取っている.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <h2 class="main-header">第二次世界大戦後の世界秩序</h2>
+
+        <div class="quiz-section">
+            <h3>敗戦国の戦後処理</h3>
+            <p>
+                ドイツでは、アメリカ、イギリス、ソ連、フランスの4国による分割占領と共同管理、旧首都<input class="blank" data-ans="ベルリン"
+                    style="width:80px">の分割管理、民主化の徹底などが実施された.同時に、<input class="blank" data-ans="ニュルンベルク"
+                    style="width:100px">に<input class="blank" data-ans="国際軍事裁判所"
+                    style="width:140px">が設置され、ナチス=ドイツ指導者の<input class="blank" data-ans="戦争犯罪"
+                    style="width:100px">が追求された.
+            </p>
+            <p>
+                日本は、アメリカ軍による事実上の単独占領下におかれ、<input class="blank" data-ans="軍隊" style="width:60px">の解散、女性解放（<input
+                    class="blank" data-ans="参政" style="width:60px">権の付与）、経済機構の民主化（<input class="blank" data-ans="農地"
+                    style="width:60px">改革、<input class="blank" data-ans="財閥" style="width:60px">解体）、労働政策改革（<input
+                    class="blank" data-ans="労働組合" style="width:100px">の結成奨励、<input class="blank" data-ans="労働三法"
+                    style="width:80px">制定）、<input class="blank" data-ans="教育"
+                    style="width:60px">改革などの民主的改革が実施された.さらに、<input class="blank" data-ans="東京"
+                    style="width:60px">に<input class="blank" data-ans="極東国際軍事裁判所"
+                    style="width:160px">を設置し戦争犯罪が裁かれ、<input class="blank" data-ans="東條英機"
+                    style="width:100px">元首相ら7名が死刑判決を受けた.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <div class="quiz-section">
+            <h3>米ソ冷戦の始まり</h3>
+            <p>
+                第二次世界大戦中協力関係にあった米ソは、戦後「<input class="blank" data-ans="冷戦" style="width:60px"> (ColdWar)」といわれる<input
+                    class="blank" data-ans="資本主義" style="width:100px">陣営と<input class="blank" data-ans="社会主義"
+                    style="width:100px">陣営間の対立を深めた.
+            </p>
+            <p>
+                アメリカは、1947年に<input class="blank" data-ans="社会主義" style="width:240px">封じ込め政策、すなわち<input class="blank"
+                    data-ans="トルーマン" style="width:240px">・<input class="blank" data-ans="ドクトリン"
+                    style="width:240px">を、またマーシャル・プランを相次いで表明し、1948年の<input class="blank" data-ans="ベルリン封鎖"
+                    style="width:360px">などの東西対立を受けて、翌1949年には西側の集団安全保障機構である<input class="blank" data-ans="北大西洋条約機構"
+                    style="width:480px">（<input class="blank" data-ans="NATO" style="width:180px">）を結成した.
+            </p>
+            <p>
+                ソ連は、各国共産党の連絡を強化するため1947年に<input class="blank" data-ans="コミンフォルム"
+                    style="width:360px">（共産党情報局）を結成し、1949年には<input class="blank" data-ans="社会主義"
+                    style="width:240px">諸国の経済協力機構として<input class="blank" data-ans="経済相互援助会議" style="width:420px">（<input
+                    class="blank" data-ans="COMECON" style="width:240px">）を、西ドイツの<input class="blank" data-ans="NATO"
+                    style="width:180px">加盟に対抗して1955年に安全保障機構の<input class="blank" data-ans="ワルシャワ条約機構"
+                    style="width:480px">（WTO）を発足させた.
+            </p>
+            <p>
+                こうした緊張の高まりのなかで、ドイツでもアメリカ、イギリス、フランスの占領地区とソ連占領地区の分断が進んだ.1948年6月、ソ連は西側地区の通貨改革に反対し、西ベルリンへの交通を遮断する<input
+                    class="blank" data-ans="ベルリン封鎖"
+                    style="width:120px">を実施した.西側3国は生活必需品の空輸で対抗し、1年ほどで封鎖は解除されたが、東西ベルリンは分断された.
+            </p>
+            <p>
+                1949年5月にボンを首都として<input class="blank" data-ans="ドイツ連邦共和国"
+                    style="width:360px">（東ドイツ）が、同年10月にはベルリンを首都として<input class="blank" data-ans="ドイツ民主共和国"
+                    style="width:360px">（西ドイツ）が成立し、ドイツの東西分立が決定した.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sheet-2" class="sheet container">
+        <h2 class="sheet-title">第2回 第二次世界大戦後の東アジア</h2>
+
+        <h2 class="main-header">中華人民共和国の成立</h2>
+        <div class="quiz-section">
+            <h3>中華人民共和国の成立</h3>
+            <p>
+                第二次世界大戦の終結によって中国は戦勝国となり、5大国の一つとして国際的地位を高めたが、国内では主導権の維持をはかる中国<input class="blank" data-ans="共産"
+                    style="width:60px">党と、大戦中に勢力を拡大した中国<input class="blank" data-ans="国民"
+                    style="width:60px">党との対立が激化し、<input class="blank" data-ans="国共内戦" style="width:100px">に突入した.
+            </p>
+            <p>
+                インフレーションを引き起こした経済政策の失敗や、一党独裁傾向を強めたことによって<input class="blank" data-ans="国民"
+                    style="width:60px">党政権が支持を失ったのに対し、<input class="blank" data-ans="共産"
+                    style="width:60px">党は支配地域で<input class="blank" data-ans="土地改革"
+                    style="width:100px">を実施し、農村の物資動員と兵員確保に成功した.<input class="blank" data-ans="共産"
+                    style="width:60px">党はまず東北地方をおさえてソ連から旧日本軍の兵器を入手し、1947年より反攻を開始.1949年3月には国民政府の首都である<input class="blank"
+                    data-ans="南京" style="width:60px">を占領した.
+            </p>
+            <p>
+                <input class="blank" data-ans="蒋介石" style="width:80px">は1949年12月、<input class="blank" data-ans="台湾"
+                    style="width:60px">に逃れ、そこで<input class="blank" data-ans="中華民国政府" style="width:120px">を維持し、「<input
+                    class="blank" data-ans="大陸反攻" style="width:100px">」を唱えた.
+            </p>
+            <p>
+                台湾では、本省人(台湾の住民) と外省人(日本統治終了後に大陸から来た人々)の対立を背景に、1947年には「<input class="blank" data-ans="二"
+                    style="width:40px">・<input class="blank" data-ans="二八事件"
+                    style="width:80px">」と呼ばれる民衆の抗議やデモが発生した.大陸から国民政府が援軍を送り、民衆の行動は厳しく弾圧され、戒厳令が布告された.
+            </p>
+            <p>
+                中国<input class="blank" data-ans="共産" style="width:60px">党は1949年9月、党統一戦線に参加する諸勢力を北京の<input class="blank"
+                    data-ans="人民政治協商会議" style="width:160px">に招集した.会議は1949年10月、<input class="blank" data-ans="中華人民共和国"
+                    style="width:140px">の成立を宣言し、<input class="blank" data-ans="毛沢東" style="width:80px">を主席、<input
+                    class="blank" data-ans="周恩来" style="width:80px">を首相とし、首都を北京に定めた.ここに中国<input class="blank"
+                    data-ans="共産" style="width:60px">党が指導する事実上の一党独裁国家が誕生した.
+            </p>
+            <p>
+                1950年2月にはモスクワで<input class="blank" data-ans="中ソ友好同盟相互援助条約"
+                    style="width:600px">が調印され、中国は社会主義圏に属する姿勢を明らかにした.アメリカは、台湾の<input class="blank" data-ans="中華民国政府"
+                    style="width:360px">を中国の正式代表とする立場をとった
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <h2 class="main-header">朝鮮戦争の勃発</h2>
+        <div class="quiz-section">
+            <h3>朝鮮戦争の勃発と中国</h3>
+            <p>
+                朝鮮は1943年の<input class="blank" data-ans="カイロ会議" style="width:100px">で独立が約束されていたが、戦後は北緯<input
+                    class="blank" data-ans="38" style="width:40px">度線を境界に、北を<input class="blank" data-ans="ソ連"
+                    style="width:60px">が、南を<input class="blank" data-ans="アメリカ"
+                    style="width:80px">が占領下に置いた.米ソ対立が激化する中で、南部では1948年にアメリカから帰国した<input class="blank" data-ans="李承晩"
+                    style="width:80px">を大統領として<input class="blank" data-ans="大韓民国" style="width:100px">（韓国）が、北部では<input
+                    class="blank" data-ans="金日成" style="width:80px">を首相 (1972年以降は首席)として<input class="blank"
+                    data-ans="朝鮮民主主義人民共和国" style="width:200px">（北朝鮮）の独立が宣言され、南北が分立した.
+            </p>
+            <p>
+                1950年6月25日、北朝鮮は南北統一を目指し、境界線である<input class="blank" data-ans="38" style="width:60px">度線をこえて侵攻し、<input
+                    class="blank" data-ans="朝鮮戦争" style="width:240px">が始まった.北朝鮮軍は朝鮮半島南端の釜山に迫ったが、国際連合<input class="blank"
+                    data-ans="安全保障理事会" style="width:420px">は北朝鮮軍の行動を侵略とみなし、その勧告に応じた「<input class="blank" data-ans="国連軍"
+                    style="width:180px">」 (厳密な意味ではアメリカ軍を中心とする<input class="blank" data-ans="多国籍軍" style="width:240px">)
+                が韓国の支援に向かった.<input class="blank" data-ans="国連軍" style="width:180px">が反撃して中国国境に迫ると、中国は北朝鮮を支援するために<input
+                    class="blank" data-ans="人民義勇軍" style="width:300px">を派遣した. 戦線は<input class="blank" data-ans="38"
+                    style="width:60px">度線付近に押し戻されて膠着し、1953年に<input class="blank" data-ans="休戦協定"
+                    style="width:240px">が成立し、現在に至る南北の分断が固定化された.
+            </p>
+            <p>
+                <input class="blank" data-ans="朝鮮戦争" style="width:240px">が始まると、アメリカが艦隊を<input class="blank"
+                    data-ans="台湾海峡" style="width:240px">へ派遣したため、中国と台湾の分断も固定化した.
+            </p>
+            <p>
+                中国では<input class="blank" data-ans="朝鮮戦争"
+                    style="width:240px">勃発後にアメリカとの対立が決定的になり、社会主義化が加速することになった.1953年からの「<input class="blank"
+                    data-ans="第1次五カ年計画" style="width:420px">」と呼ばれる<input class="blank" data-ans="計画経済"
+                    style="width:240px">政策により、1950年以降の<input class="blank" data-ans="土地改革"
+                    style="width:240px">で地主層が打倒され農民に土地が分配されていた農村では、土地を共同で所有・経営する<input class="blank" data-ans="集団化"
+                    style="width:180px">が進められた.商工業では民間企業が<input class="blank" data-ans="国営化"
+                    style="width:180px">されるとともに、重化学工業が推進された.技術者の派遣や中国人技術者の訓練など<input class="blank" data-ans="ソ連"
+                    style="width:120px">に依存して行われた.
+            </p>
+            <p>
+                1956年の<input class="blank" data-ans="スターリン批判" style="width:360px">によりソ連との競争を意識した<input class="blank"
+                    data-ans="毛沢東" style="width:180px">は、<input class="blank" data-ans="第1次五カ年計画"
+                    style="width:420px">が成果をおさめたと評価されたこともあり、1958年から急激な社会主義建設を目指す「<input class="blank" data-ans="大躍進"
+                    style="width:180px">」運動を開始した.精神主義に基づいて、急速な農工業の発展を、専門技術を無視した人海戦術的な方法で遂行した.農村では<input class="blank"
+                    data-ans="人民公社" style="width:240px">を編成し、農業の大規模集団化を推し進めたが、生産意欲の減退・生産力の停滞により運動は失敗に終わった.
+            </p>
+            <p>
+                約2000-4500万人の餓死者が出たと推計され、<input class="blank" data-ans="毛沢東" style="width:180px">が一線を退き、<input
+                    class="blank" data-ans="劉少奇" style="width:180px">や<input class="blank" data-ans="鄧小平"
+                    style="width:180px">ら改革派が実権を握るようになった.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <div class="quiz-section">
+            <h3>朝鮮戦争と日本の関係</h3>
+            <p>
+                <input class="blank" data-ans="朝鮮戦争"
+                    style="width:240px">が始まると、アメリカは韓国軍を全面的に支援することを決定し、当時日本に駐留していた米軍7万5千人のほとんどを朝鮮半島に派遣することとなった.日本が軍事的空白区域となることを危惧した連合国総司令官の<input
+                    class="blank" data-ans="マッカーサー" style="width:300px">は、7月8日 <input class="blank" data-ans="吉田茂"
+                    style="width:180px">首相に書簡を送り、人員7万5千人の「ナショナル・ポリス・リザーブ」を設立することを許可すると伝えた.日本国憲法には<input class="blank"
+                    data-ans="戦力" style="width:120px">の<input class="blank" data-ans="不保持"
+                    style="width:180px">が明記されていたことから、その実態は軍事組織でありながら警察組織を装い、同年<input class="blank" data-ans="警察予備隊"
+                    style="width:300px">という名称で設立された.
+            </p>
+            <p>
+                1952年に<input class="blank" data-ans="サンフランシスコ平和条約" style="width:600px">が発効し、同時に調印した<input class="blank"
+                    data-ans="日米安全保障条約" style="width:480px">が発効すると、<input class="blank" data-ans="警察予備隊"
+                    style="width:300px">は11万人に増強され<input class="blank" data-ans="保安隊"
+                    style="width:180px">と名称を改め、上部組織として<input class="blank" data-ans="保安庁"
+                    style="width:180px">が発足した.1954年に航空<input class="blank" data-ans="自衛隊"
+                    style="width:180px">が新設され、陸上部隊・海上部隊をそれぞれ陸上<input class="blank" data-ans="自衛隊"
+                    style="width:180px">・海上<input class="blank" data-ans="自衛隊" style="width:180px">と改称し、<input
+                    class="blank" data-ans="保安庁" style="width:180px">を<input class="blank" data-ans="防衛庁"
+                    style="width:180px">とすることで今日の<input class="blank" data-ans="自衛隊" style="width:180px">が発足した.
+            </p>
+            <p>
+                経済的には、<input class="blank" data-ans="朝鮮戦争" style="width:240px">中の<input class="blank" data-ans="国連軍"
+                    style="width:180px">への物資供給（<input class="blank" data-ans="朝鮮戦争特需"
+                    style="width:360px">）によって経済復興のきっかけを掴んだ.また、1956年の<input class="blank" data-ans="日ソ共同宣言"
+                    style="width:420px">によりソ連との国交を回復したことで、日本の国際連合への加盟が実現した.
+            </p>
+            <p>
+                1965年には、韓国との間で<input class="blank" data-ans="日韓基本条約" style="width:360px">を結び、国交を回復した.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sheet-3" class="sheet container">
+        <h2 class="sheet-title">第3回 冷戦体制の動揺</h2>
+
+        <h2 class="main-header">ソ連の「雪どけ」</h2>
+        <div class="quiz-section">
+            <h3>ソ連の「雪どけ」</h3>
+            <p>
+                1953年に<input class="blank" data-ans="スターリン"
+                    style="width:240px">が死去すると、ソ連では外交政策の見直しが始まった.1956年2月、ソ連共産党第20回大会で<input class="blank"
+                    data-ans="フルシチョフ" style="width:300px">第一書記は、<input class="blank" data-ans="スターリン"
+                    style="width:240px">時代の個人崇拝を批判して、<input class="blank" data-ans="スターリン批判"
+                    style="width:360px">を行い、旧反対派への大規模な弾圧を暴露し、自由化の方針を打ち出した.さらに、西側との<input class="blank" data-ans="平和共存"
+                    style="width:240px">を掲げ、<input class="blank" data-ans="コミンフォルム"
+                    style="width:360px">を解散した.この転換は「<input class="blank" data-ans="雪どけ" style="width:180px">」と呼ばれた.
+            </p>
+            <p>
+                <input class="blank" data-ans="フルシチョフ" style="width:300px">は西側諸国との関係改善に力を注いだ.1955年に<input class="blank"
+                    data-ans="西ドイツ" style="width:240px">と国交を結び、1956年には<input class="blank" data-ans="日ソ共同宣言"
+                    style="width:420px">を出して日本との国交を回復した.さらに1959年に訪米し、<input class="blank" data-ans="アイゼンハワー"
+                    style="width:360px">大統領と会談した.しかし1960年にソ連上空でアメリカの偵察機が撃墜される事件が起こると、東西関係は再び冷え込んだ.
+            </p>
+            <p>
+                1961年、<input class="blank" data-ans="東ドイツ" style="width:240px">政府が市民の西側への脱出を阻止するため<input class="blank"
+                    data-ans="西ベルリン" style="width:300px">を囲むように築いた「<input class="blank" data-ans="ベルリンの壁"
+                    style="width:360px">」は東西対立の象徴となった.
+            </p>
+            <p>
+                <input class="blank" data-ans="フルシチョフ"
+                    style="width:300px">は、国内では経済改革を進め、言論統制を緩和した他、社会主義体制の優位を示すため宇宙開発に力を入れた.1957年にソ連は<input class="blank"
+                    data-ans="大陸間弾道ミサイル" style="width:480px">（<input class="blank" data-ans="ICBM"
+                    style="width:180px">）の開発に成功し、その技術をもとに世界初の人工衛星<input class="blank" data-ans="スプートニク1号"
+                    style="width:360px">を打ち上げ、1961年にガガーリンは世界初の<input class="blank" data-ans="有人宇宙飛行"
+                    style="width:360px">にも成功した.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <h2 class="main-header">キューバ革命とキューバ危機</h2>
+        <div class="quiz-section">
+            <h3>キューバ革命とキューバ危機</h3>
+            <p>
+                キューバでは、親米のバティスタ独裁政権のもとで、アメリカ系企業が広大な土地を所有して、砂糖栽培に特化した農業生産を行い、大多数の農民は貧困と土地不足に苦しんでいた.1959年、<input
+                    class="blank" data-ans="カストロ"
+                    style="width:180px">らがバティスタ政権を打倒して革命政権を樹立し、農地改革のためにアメリカ系企業からの土地の接収に踏み切った（<input class="blank"
+                    data-ans="キューバ革命" style="width:360px">）.
+            </p>
+            <p>
+                アメリカの<input class="blank" data-ans="アイゼンハワー" style="width:360px">政権は1961年にキューバと断交し、つづく<input
+                    class="blank" data-ans="ケネディ" style="width:240px">政権も<input class="blank" data-ans="カストロ"
+                    style="width:180px">政権の武力転覆を企てたが、失敗に終わった.
+            </p>
+            <p>
+                アメリカとの関係が悪化したキューバは、<input class="blank" data-ans="社会主義" style="width:240px">宣言を行い、ソ連に接近した.1962年、<input
+                    class="blank" data-ans="カストロ"
+                    style="width:180px">の要請に応えて、ソ連がキューバにミサイル基地建設に着手すると、ケネディ政権はソ連船による機材搬入を<input class="blank"
+                    data-ans="海上封鎖" style="width:240px">によって阻止し、米ソ間の緊張が一気に高まった（<input class="blank" data-ans="キューバ危機"
+                    style="width:360px">）.
+            </p>
+            <p>
+                しかし、<input class="blank" data-ans="核戦争"
+                    style="width:180px">の可能性を前に両国首脳は妥協に転じ、アメリカのキューバ内政への不干渉と引き換えに、ソ連がミサイル基地を撤去する合意が成立した.これ以後、米ソ両国は<input
+                    class="blank" data-ans="緊張緩和" style="width:240px">に転換して、両国首脳間を結ぶ直通通話回線（<input class="blank"
+                    data-ans="ホットライン" style="width:300px">）も敷設された.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <h2 class="main-header">ベトナム戦争</h2>
+        <div class="quiz-section">
+            <h3>ベトナム戦争</h3>
+            <p>
+                冷戦の間、米ソは直接の武力衝突を起こさなかった.しかし、アジアやアフリカでは、米ソがそれぞれ後押しする勢力による<input class="blank" data-ans="代理戦争"
+                    style="width:240px">が起こった.<input class="blank" data-ans="ベトナム戦争" style="width:300px">もその一つである.
+            </p>
+            <p>
+                <input class="blank" data-ans="ベトナム共和国"
+                    style="width:360px">（南ベトナム）ではゴ=ディン=ジエム政権が独裁を強める中、1960年に南ベトナムの解放を目指す<input class="blank"
+                    data-ans="南ベトナム民族解放戦線" style="width:600px">が結成され、<input class="blank" data-ans="ベトナム民主共和国"
+                    style="width:420px">（北ベトナム）と連携して<input class="blank" data-ans="ゲリラ戦"
+                    style="width:240px">を展開した.1963年にジエム政権が軍のクーデターによって倒れたのち、アメリカの<input class="blank" data-ans="ケネディ"
+                    style="width:240px">政権は南ベトナムの軍事援助を本格化させた.
+            </p>
+            <p>
+                北ベトナム正規軍が南ベトナムに派遣されると、1965年に<input class="blank" data-ans="ジョンソン"
+                    style="width:240px">政権は北ベトナムへの爆撃（<input class="blank" data-ans="北爆"
+                    style="width:120px">）と大規模な軍事介入に踏み切った.しかし、ソ連と中国の軍事援助に支えられた北ベトナム軍と解放戦線は、森林での<input class="blank"
+                    data-ans="ゲリラ戦"
+                    style="width:240px">を展開し、近代兵器で武装した米軍に粘り強く対抗した.1968年までにアメリカは約50万人の地上兵力を南ベトナムに派遣したが、戦局は泥沼化する一方だった.
+            </p>
+            <p>
+                ベトナム戦争に対して国際世論は批判を高め、アメリカの世論も二分された.1968年、アメリカは<input class="blank" data-ans="北爆"
+                    style="width:120px">を停止し、北ベトナム側とパリで和平交渉に入った.日本では、沖縄の米軍基地が<input class="blank" data-ans="ベトナム戦争"
+                    style="width:300px">に利用されていたことへの批判が高まり、1972年に<input class="blank" data-ans="沖縄返還"
+                    style="width:240px">が実現したものの、広大な米軍基地は残った.
+            </p>
+            <p>
+                1973年には<input class="blank" data-ans="ベトナム" style="width:240px">(<input class="blank" data-ans="パリ"
+                    style="width:120px">)<input class="blank" data-ans="和平協定" style="width:240px">が実現し、<input
+                    class="blank" data-ans="ニクソン" style="width:240px">大統領は米軍を南ベトナムから撤退させた.1975年、北ベトナム軍と<input
+                    class="blank" data-ans="解放戦線" style="width:240px">は<input class="blank" data-ans="サイゴン"
+                    style="width:180px">（現<input class="blank" data-ans="ホーチミン"
+                    style="width:240px">）を占領し、1976年に南北を統一した<input class="blank" data-ans="ベトナム社会主義共和国"
+                    style="width:600px">が成立した.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <h2 class="main-header">中ソ対立と文化大革命</h2>
+        <div class="quiz-section">
+            <h3>中ソ対立と文化大革命</h3>
+            <p>
+                ソ連では、自由化の進展を危惧する共産党内の保守派によって、1964年に<input class="blank" data-ans="フルシチョフ"
+                    style="width:300px">が解任され、<input class="blank" data-ans="ブレジネフ" style="width:300px">が後任となった.
+            </p>
+            <p>
+                中国では、<input class="blank" data-ans="毛沢東" style="width:180px">はアメリカとの対決路線をとり、ソ連の<input class="blank"
+                    data-ans="平和共存" style="width:240px">路線を批判した.これに対してソ連は、1960年に中国への経済援助を停止して技術者を引き揚げたが、中国は自力で<input
+                    class="blank" data-ans="原爆" style="width:120px">、ついで<input class="blank" data-ans="水爆"
+                    style="width:120px">の開発に成功した.
+            </p>
+            <p>
+                社会主義建設の是非を巡る中ソ論争は、1963年から公開論争となり、両国の対立（<input class="blank" data-ans="中ソ対立"
+                    style="width:240px">）は世界が知るところとなった.1969年には中ソ国境で軍事衝突も起こった.
+            </p>
+            <p>
+                <input class="blank" data-ans="毛沢東" style="width:180px">はさらに「<input class="blank" data-ans="大躍進"
+                    style="width:180px">」の失敗後に経済の立て直しを行っていた<input class="blank" data-ans="劉少奇"
+                    style="width:180px">,<input class="blank" data-ans="鄧小平" style="width:180px">ら改革派に対抗して、1966年に<input
+                    class="blank" data-ans="プロレタリア文化大革命" style="width:600px">という新たな運動を全国に呼びかけた.若い世代を中心に<input
+                    class="blank" data-ans="紅衛兵" style="width:180px">など全国的な大衆運動が組織され、党幹部や知識人を迫害した.<input class="blank"
+                    data-ans="劉少奇" style="width:180px">,<input class="blank" data-ans="鄧小平" style="width:180px">らも<input
+                    class="blank" data-ans="資本主義" style="width:240px">復活をはかる修正主義者と非難され、失脚に追い込まれた.
+            </p>
+            <p>
+                <input class="blank" data-ans="中ソ対立" style="width:240px">激化の中、国際的に孤立していた中国は、アメリカとの関係改善をはかるようになった.<input
+                    class="blank" data-ans="ベトナム戦争"
+                    style="width:300px">で威信が揺らいでいたアメリカも、国際社会での主導権を再確立するために中国への接近をはかり、1972年に<input class="blank"
+                    data-ans="ニクソン" style="width:240px">大統領が中国を訪問し、<input class="blank" data-ans="毛沢東"
+                    style="width:180px">との間で関係正常化に合意した.
+            </p>
+            <p>
+                突然の<input class="blank" data-ans="米中接近" style="width:240px">は日本にも衝撃を与え、1972年に<input class="blank"
+                    data-ans="田中角栄" style="width:240px">首相が北京を訪問して国交正常化を実現し、1978年に<input class="blank"
+                    data-ans="日中平和友好条約" style="width:420px">を締結した.1979年には米中国交正常化が実現した.
+            </p>
+            <p>
+                <input class="blank" data-ans="国連" style="width:120px">では、1971年に台湾の<input class="blank"
+                    data-ans="中華民国政府" style="width:360px">にかわって北京政府の代表権が確認された.
+            </p>
+            <p>
+                1971年、<input class="blank" data-ans="毛沢東" style="width:180px">の後継者と見られた<input class="blank"
+                    data-ans="林彪" style="width:120px">が失脚し、1976年1月には<input class="blank" data-ans="周恩来"
+                    style="width:240px">首相が、同年9月には<input class="blank" data-ans="毛沢東" style="width:180px">が死亡すると、<input
+                    class="blank" data-ans="華国鋒" style="width:180px">首相は毛沢東夫人<input class="blank" data-ans="江青"
+                    style="width:120px">ら<input class="blank" data-ans="文化大革命" style="width:240px">を主導した「<input
+                    class="blank" data-ans="四人組" style="width:180px">」を逮捕した.これを受けて1977年、深刻な社会的混乱をもたらした<input
+                    class="blank" data-ans="文化大革命" style="width:240px">終了が宣言された.
+            </p>
+            <p>
+                復権した<input class="blank" data-ans="鄧小平" style="width:180px">を中心とした新指導部は、<input class="blank"
+                    data-ans="計画経済" style="width:240px">から<input class="blank" data-ans="市場経済"
+                    style="width:240px">への転換をはかり、1978年以降、農業・工業・国防・科学技術の「<input class="blank" data-ans="四つの近代化"
+                    style="width:360px">」など<input class="blank" data-ans="改革開放" style="width:240px">路線を推進した.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sheet-4" class="sheet container">
+        <h2 class="sheet-title">第4回 冷戦の集結</h2>
+
+        <h2 class="main-header">ソ連の「ベレストロイカ」</h2>
+        <div class="quiz-section">
+            <h3>ソ連の「ベレストロイカ」</h3>
+            <p>
+                1980年代前半のソ連は、<input class="blank" data-ans="技術革新"
+                    style="width:240px">に大きく立ち遅れ、工業成長率はゼロ近くにまで落ち込んだ.改善を訴える科学者らの提言も、言論統制によって無視された.<input class="blank"
+                    data-ans="ブレジネフ" style="width:300px">は1982年に死去したが、その後も高齢の指導者による短命政権が続き社会には閉塞感が広まった.
+            </p>
+            <p>
+                1985年にようやく指導層の世代交代が行われ、<input class="blank" data-ans="ゴルバチョフ" style="width:300px">が指導者となった.1986年に<input
+                    class="blank" data-ans="チェルノービリ" style="width:360px">（<input class="blank" data-ans="チェルノブイリ"
+                    style="width:360px">）<input class="blank" data-ans="原子力発電所" style="width:420px">で大規模事故が発生すると、<input
+                    class="blank" data-ans="ゴルバチョフ" style="width:300px">は「<input class="blank" data-ans="ペレストロイカ"
+                    style="width:360px">
+                (建て直し)」をスローガンに<input class="blank" data-ans="社会主義" style="width:240px">体制の改革に着手した.
+            </p>
+            <p>
+                まず企業に経営上の自主性を与えるなどの経済改革を試みたが、<input class="blank" data-ans="共産党"
+                    style="width:240px">自体は改革に消極的だった.そこで<input class="blank" data-ans="ゴルバチョフ"
+                    style="width:300px">は「<input class="blank" data-ans="グラスノスチ" style="width:360px"> (情報公開)」を唱えて、<input
+                    class="blank" data-ans="世論"
+                    style="width:120px">の力で改革を推進しようと考えた.そのための新制度として、1989年には複数候補制の選挙に基づく人民代議員大会が開かれ、さらに1990年には、<input
+                    class="blank" data-ans="共産党" style="width:240px">書記長のまま、新設のソ連大統領に就任した.
+            </p>
+            <p>
+                <input class="blank" data-ans="ゴルバチョフ" style="width:300px">は軍拡の負担から逃れるため、「<input class="blank"
+                    data-ans="新思考外交" style="width:360px">」を唱えてアメリカに対話を呼びかけた.軍縮による財政赤字の削減を期待するアメリカの<input class="blank"
+                    data-ans="レーガン" style="width:240px">大統領もこれに応え、1985年11月に米ソ首脳会談が実現し、戦略<input class="blank"
+                    data-ans="核兵器" style="width:240px">の半減などに合意した.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <h2 class="main-header">冷戦の終結</h2>
+        <div class="quiz-section">
+            <h3>冷戦の終結</h3>
+            <p>
+                <input class="blank" data-ans="ゴルバチョフ"
+                    style="width:300px">はソ連軍駐留経費などの課題を抱える東欧支配の見直しもはかり、1988年には今後東欧諸国に<input class="blank" data-ans="内政干渉"
+                    style="width:240px">を行わないと宣言した.東ドイツでは改革に抵抗する<input class="blank" data-ans="ホネカー"
+                    style="width:240px">書記長が失脚し、<input class="blank" data-ans="ベルリンの壁"
+                    style="width:360px">が開放された.東欧諸国の一連の体制転換によって、東欧社会主義圏は消滅した ( <input class="blank" data-ans="東欧革命"
+                    style="width:240px"> ).
+            </p>
+            <p>
+                <input class="blank" data-ans="東欧革命" style="width:240px">が進む中で、1989年12月に<input class="blank"
+                    data-ans="ゴルバチョフ" style="width:300px">はアメリカの<input class="blank" data-ans="ブッシュ"
+                    style="width:240px">大統領と地中海のマルタ島沖で首脳会談 ( <input class="blank" data-ans="マルタ会談" style="width:300px">
+                )
+                を開催して、冷戦の終結を宣言した.1990年の10月には米ソ英仏の同意を得て、<input class="blank" data-ans="西" style="width:60px">ドイツが<input
+                    class="blank" data-ans="東" style="width:60px">ドイツを吸収することで統一ドイツが誕生し、1991年には<input class="blank"
+                    data-ans="COMECON" style="width:240px">と<input class="blank" data-ans="ワルシャワ条約機構"
+                    style="width:480px">も解消された.
+            </p>
+            <p>
+                ソ連の改革の影響を受けて、東欧の<input class="blank" data-ans="社会主義"
+                    style="width:240px">体制が崩壊したのに対し、中国では事態は異なった.1970年代後半から1980年代後半にかけて<input class="blank"
+                    data-ans="鄧小平" style="width:180px">ら新指導部は、<input class="blank" data-ans="人民公社"
+                    style="width:240px">の解体や外国資本・技術の導入による開放経済、国営企業の独立採算化等、一連の経済改革 ( <input class="blank"
+                    data-ans="社会主義市場経済" style="width:480px">化) を推進した.
+            </p>
+            <p>
+                その一方で、学生や知識人の間では共産党の一党独裁の持続や、民主化なき経済改革への不満も募っていった.1989年には北京の<input class="blank" data-ans="天安門広場"
+                    style="width:360px">に集まり、民主化を要求したが、政府がこれを武力で押さえ込んだ ( <input class="blank" data-ans="天安門事件"
+                    style="width:360px"> ).民主化運動に理解を示した<input class="blank" data-ans="趙紫陽"
+                    style="width:180px">総書記は解任され、後任には<input class="blank" data-ans="江沢民" style="width:180px">が任命された.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <h2 class="main-header">資本主義経済の歴史 (「通史編」まとめ)</h2>
+        <div class="quiz-section">
+            <h3>資本主義経済の成立と発展</h3>
+            <p>
+                資本主義経済は、1760年頃から1830年頃にかけてイギリスで展開された<input class="blank" data-ans="産業革命"
+                    style="width:100px">を経て成立した.ここに、生産手段を所有する<input class="blank" data-ans="資本家"
+                    style="width:80px">と労働力を所有する<input class="blank" data-ans="労働者"
+                    style="width:80px">の二大階級の成立を見ることができる.
+            </p>
+            <p>
+                資本主義経済 (⇔<input class="blank" data-ans="社会主義" style="width:240px">経済) の特徴は以下の通り.<br>
+                ① 生産手段の<input class="blank" data-ans="私" style="width:40px">的所有 (⇔生産手段の<input class="blank"
+                    data-ans="社会" style="width:60px">的所有)<br>
+                ② 自由な生産活動 ( <input class="blank" data-ans="市場経済" style="width:240px">⇔<input class="blank"
+                    data-ans="計画経済" style="width:240px"> ) 市場原理、契約自由の原則、<input class="blank" data-ans="自由放任"
+                    style="width:280px">主義<br>
+                ③ 商品生産社会･･･労働力も商品化<br>
+                ④ <input class="blank" data-ans="利潤" style="width:60px">追求社会
+            </p>
+            <p>
+                初期の資本主義は、政府の経済への介入を極力控える<input class="blank" data-ans="自由放任" style="width:280px">主義 ( <input
+                    class="blank" data-ans="レッセ" style="width:180px">・<input class="blank" data-ans="フェール"
+                    style="width:180px"> ) を基本理念として掲げており、この18世紀後半から19世紀末までの資本主義は<input class="blank" data-ans="産業"
+                    style="width:120px">資本主義と呼ばれる.しかし、こうした自由競争は、資本の集積・集中を通じて巨大企業の成立を促し、結果として市場の<input class="blank"
+                    data-ans="寡占" style="width:60px">化が進んだ.この19世紀末から20世紀初にかけての資本主義は、<input class="blank" data-ans="独占"
+                    style="width:60px">資本主義と呼ばれる.
+            </p>
+            <p>
+                1929年にアメリカに端を発した<input class="blank" data-ans="世界恐慌" style="width:100px">は、<input class="blank"
+                    data-ans="自由放任" style="width:100px">主義を理念に掲げる資本主義経済を大きく変容させた.1933年にアメリカ大統領に就任した<input class="blank"
+                    data-ans="ルーズヴェルト" style="width:140px">による<input class="blank" data-ans="ニューディール"
+                    style="width:140px">政策は、従来の<input class="blank" data-ans="自由放任"
+                    style="width:100px">主義を放棄し、政府の経済への積極的<input class="blank" data-ans="介入"
+                    style="width:60px">を試みた先駆的事例である.
+            </p>
+            <p>
+                これは不況下で不足している<input class="blank" data-ans="有効需要" style="width:100px"> (実際に貨幣の支出を伴う需要) を政府が<input
+                    class="blank" data-ans="公共投資" style="width:100px">を拡大して創出しようとする<input class="blank"
+                    data-ans="有効需要創出" style="width:140px">政策であった.このように政府が経済に<input class="blank" data-ans="介入"
+                    style="width:60px">し
+                (「<input class="blank" data-ans="大きな政府" style="width:100px">」と呼ばれる)、民間部門と公的部門とが並存する経済は、<input
+                    class="blank" data-ans="混合経済"
+                    style="width:100px">と呼ばれる.また、経済活動の自由を一部制限して、経済的な平等を出来るだけ実現しようとする資本主義は、<input class="blank"
+                    data-ans="修正" style="width:60px">資本主義と呼ばれる.
+            </p>
+            <p>
+                1970年代以降、<input class="blank" data-ans="オイルショック" style="width:360px">を背景にスタグフレーションが発生すると、<input
+                    class="blank" data-ans="有効需要" style="width:240px">管理政策の限界性が指摘されるようになった.政府の役割を<input class="blank"
+                    data-ans="縮小" style="width:120px">し、規制緩和や減税政策を推進し、市場の自由競争に委ねる「<input class="blank" data-ans="小さな政府"
+                    style="width:300px">」への転換を進めるべきとの声が強くなった.このような資本主義は、<input class="blank" data-ans="新自由"
+                    style="width:240px">主義と呼ばれる.
+            </p>
+            <p>
+                <input class="blank" data-ans="新自由" style="width:240px">主義の立場から経済再建を目指した政策として、アメリカの<input class="blank"
+                    data-ans="レーガン" style="width:240px">大統領によるレーガノミックス、イギリスの<input class="blank" data-ans="サッチャー"
+                    style="width:300px">首相によるサッチャリズムが挙げられる.1980年代半ばに日本で行われた<input class="blank" data-ans="中曽根"
+                    style="width:180px">政権による三公社 (電電公社、専売公社、国鉄) の<input class="blank" data-ans="民営化"
+                    style="width:240px">もこうした動きの例である.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <div class="quiz-section">
+            <h3>社会主義経済の成立と市場経済への移行</h3>
+            <p>
+                19世紀半ばから資本主義の発展に伴って顕在化した<input class="blank" data-ans="貧富" style="width:60px">の差の拡大や<input class="blank"
+                    data-ans="恐慌" style="width:60px">の発生 ( <input class="blank" data-ans="失業" style="width:60px">問題)
+                など資本主義経済の矛盾を生産手段の<input class="blank" data-ans="社会" style="width:60px">的所有による解消を目指す<input class="blank"
+                    data-ans="社会主義" style="width:100px">思想が広がった.
+                <input class="blank" data-ans="社会主義" style="width:240px">思想を集大成したのは、ドイツの経済学者
+                <input class="blank" data-ans="マルクス" style="width:80px">と<input class="blank" data-ans="エンゲルス"
+                    style="width:80px">であった.彼らは『<input class="blank" data-ans="共産党宣言" style="width:120px">』 (1848年)
+                を公刊し、土地や工場、銀行など経済の重要な要素を公有化するための社会革命
+                (資本主義から<input class="blank" data-ans="社会主義" style="width:100px">への移行) が必要であると説いた.また<input class="blank"
+                    data-ans="マルクス" style="width:80px">は『<input class="blank" data-ans="資本論"
+                    style="width:100px">』を著して、資本主義においては、<input class="blank" data-ans="労働者"
+                    style="width:80px">は自由な立場で労働してもその報酬を完全には受け取れない仕組み ( <input class="blank" data-ans="搾取"
+                    style="width:60px"> ) があり、他方でも<input class="blank" data-ans="利潤"
+                    style="width:60px">を無限に拡大することはできないため、こうした無理のある経済体制はいずれ崩壊すると論じた.
+            </p>
+            <p>
+                1917年にロシアでは<input class="blank" data-ans="レーニン" style="width:180px">の指導のもと社会主義革命が展開され ( <input
+                    class="blank" data-ans="ロシア革命" style="width:300px"> )、1922年にソ連 ( <input class="blank"
+                    data-ans="ソビエト社会主義共和国連邦" style="width:720px"> ) が成立した.1928年からは5年を一区切りとする「<input class="blank"
+                    data-ans="五カ年計画"
+                    style="width:300px">」が開始され、ソ連経済は順調に発展した.しかし、第二次世界大戦後しばらくすると資本主義国との経済格差が目立ち、国民経済も停滞した.<input
+                    class="blank" data-ans="ゴルバチョフ" style="width:300px">政権下で進められた<input class="blank" data-ans="ペレストロイカ"
+                    style="width:360px">など各種の政策もこうした事態を打開することはできず、1989年には東欧諸国の<input class="blank" data-ans="共産"
+                    style="width:120px">党政権が崩壊し、1991年にはソ連も解体され、その後<input class="blank" data-ans="市場経済"
+                    style="width:240px">化が進んだ.
+            </p>
+            <p>
+                中国では、社会主義経済に<input class="blank" data-ans="市場経済" style="width:240px">システムを導入し、<input class="blank"
+                    data-ans="共産" style="width:120px">党と国家による<input class="blank" data-ans="市場経済"
+                    style="width:240px">を基礎に行政指導で経済調節を行う<input class="blank" data-ans="社会主義市場経済"
+                    style="width:480px">が導入されている. またベトナムでは、1986年以来「<input class="blank" data-ans="ドイモイ"
+                    style="width:180px"> (刷新)」政策の名の下に、集権的な管理体制を是正し、<input class="blank" data-ans="市場経済"
+                    style="width:240px">システムや開放政策を導入している.今日では、社会主義経済を採用している国は、朝鮮民主主義人民共和国 (北朝鮮) やキューバなど少数に過ぎない.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="sheet-5" class="sheet container">
+        <h2 class="sheet-title">第5回 近世日本数学史─17世紀和算史概観</h2>
+
+        <h2 class="main-header">和算の成立と社会背景</h2>
+        <div class="quiz-section">
+            <h3>和算の成立と社会背景</h3>
+            <p>
+                近代以前、特に<input class="blank" data-ans="江戸" style="width:60px">時代における日本の数学のことを<input class="blank"
+                    data-ans="和算" style="width:60px">と呼ぶ.和算は、近世日本（<input class="blank" data-ans="江戸"
+                    style="width:60px">時代）において、独自の発展を遂げる.
+            </p>
+            <p>
+                17世紀に入り<input class="blank" data-ans="江戸"
+                    style="width:60px">幕府という強大な統一権力が出現し、全国各地の戦国大名の行動は統制される.大名は武力で領土拡張をはかることは不可能となり、自領の<input
+                    class="blank" data-ans="経済" style="width:60px">力を高めることによってのみ成長が可能となる状況に追い込まれる.<input class="blank"
+                    data-ans="新田開発" style="width:60px">が活発化し、全国各地で大規模な<input class="blank" data-ans="土木工事"
+                    style="width:80px">、干拓、開拓が起こり、堤防の築造や<input class="blank" data-ans="測量術"
+                    style="width:80px">などの高度な技術が要求された.
+            </p>
+            <p>
+                戦国時代末期になると、日本に新しい計算道具である<input class="blank" data-ans="そろばん" style="width:60px">が<input class="blank"
+                    data-ans="中国" style="width:60px">から流入することで<input class="blank" data-ans="和算"
+                    style="width:80px">の基礎が確立する.<input class="blank" data-ans="そろばん"
+                    style="width:80px">の日本への導入の詳細は明らかではないが、16世紀末に盛んとなっていた日中貿易、東南アジア貿易に従事した商人らが導入したものと予想される.江戸時代特有の経済システムである<input
+                    class="blank" data-ans="石高制" style="width:80px">が展開することで、税務としての<input class="blank" data-ans="年貢米"
+                    style="width:60px">の割り当て、<input class="blank" data-ans="米" style="width:80px">
+                の換金といった業務を専門とする算術家の需要を全国に高め、<input class="blank" data-ans="そろばん" style="width:80px">が用いられた.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <div class="quiz-section">
+            <h3>『塵劫記』の登場</h3>
+            <p>
+                <input class="blank" data-ans="吉田光由" style="width:100px">
+                (1598-1672)は1627年にそろばんの教科書で当時の初等算術をも包含した『<input class="blank" data-ans="塵劫記"
+                    style="width:80px">』(初版)を著す.江戸時代の人々の圧倒的な支持を受け、近世を通じて算術書の代名詞的存在となる.
+            </p>
+            <p>
+                現存する最古の初等算術書としては、<input class="blank" data-ans="毛利重能" style="width:100px">が1622年頃に著した『<input
+                    class="blank" data-ans="割算書"
+                    style="width:80px">』の存在が知られる.そろばんによる割算の仕方を述べ、面積や体積計算など日用算術にも及んでいる.一方『<input class="blank"
+                    data-ans="塵劫記" style="width:80px">』は、内容が洗練され、田畑の面積計算や容器の体積計算、木の高さの測量といった<input class="blank"
+                    data-ans="実用" style="width:60px">的問題に加え、ねずみ算や継子立といった<input class="blank" data-ans="遊戯"
+                    style="width:60px">的問題を含む構成であり、人々の興味関心を惹きつける工夫が盛り込まれていた.内容は完全に吉田自身のオリジナルではなく、明代の数学書で程大位の『算法統宗』(1592年)の影響がうかがえる.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <div class="quiz-section">
+            <h3>遺題の風習</h3>
+            <p>
+                『<input class="blank" data-ans="塵劫記"
+                    style="width:80px">』は吉田の存命の頃より海賊本が出回るほど人気を博しており、これに業を煮やした吉田は全体の巻数を増やしたり二色刷りにしたりと改善、改版を繰り返す.1641年に難題12題を、<input
+                    class="blank" data-ans="解答"
+                    style="width:60px">を伏せた形で掲載し、これを読者が解けるか挑発した.これに応じた他の和算家らは刊行した自らの算術書の中で<input class="blank"
+                    data-ans="遺題" style="width:60px">に解答し、独自の<input class="blank" data-ans="遺題"
+                    style="width:60px">を新規に提出した.これが連鎖反応を生み、1640年代から70年代までの間に20以上もの算術書が刊行された.この算術書出版ブームを「<input
+                    class="blank" data-ans="遺題継承" style="width:100px">」と呼ぶ.
+            </p>
+            <p>
+                数多くの遺題の中で、難問であったのは<input class="blank" data-ans="代数方程式" style="width:120px">に帰着する問題であった.<input
+                    class="blank" data-ans="方程式" style="width:80px">の概念を持たなかった和算家は、元代に編み出された算木による方程式の構成法である「<input
+                    class="blank" data-ans="天元術" style="width:80px">」を、朱世傑の『算学啓蒙」(1299年)から再発見することで対処した.<input
+                    class="blank" data-ans="天元術" style="width:80px">を日本で初めて正しく用いた算術書としては、<input class="blank"
+                    data-ans="沢口一之" style="width:100px">が1671年に著した『<input class="blank" data-ans="古今算法記"
+                    style="width:120px">』が挙げられる.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+
+        <div class="quiz-section">
+            <h3>関孝和の登場</h3>
+            <p>
+                「<input class="blank" data-ans="遺題継承" style="width:100px">」の流れの中で、<input class="blank" data-ans="沢口一之"
+                    style="width:100px">の『<input class="blank" data-ans="古今算法記"
+                    style="width:120px">』(1671年)の遺題15問に答えたのが<input class="blank" data-ans="関孝和"
+                    style="width:100px">の『<input class="blank" data-ans="発微算法" style="width:100px">』(1674年)である.<input
+                    class="blank" data-ans="関孝和"
+                    style="width:100px">は、内山氏に生まれ関家の養子となる.関家は甲府藩の勘定方を務めており、甲府藩の実施した検地の際の検地帳の取りまとめなどを行っている.1705年に幕臣となるが、3年後の1708年に亡くなる.<input
+                    class="blank" data-ans="関孝和" style="width:100px">の伝記について、詳しいことはほとんどわかっていない.<input class="blank"
+                    data-ans="関孝和" style="width:100px">の死後、1712年に門弟の<input class="blank" data-ans="荒木村英"
+                    style="width:100px">(生没年不詳)が『<input class="blank" data-ans="括要算法" style="width:100px">』を遺稿として出版している.
+            </p>
+            <p>
+                和算家としての関孝和の数学的業績は、ベルヌーイ数の導出、終結式の利用、円周率の算出に加速法を用いたことなどが挙げられる.また記号法の導入について、数式を表記するための独自の記号法である「<input
+                    class="blank" data-ans="傍書法" style="width:80px">」を創始した.<input class="blank" data-ans="天元術"
+                    style="width:80px">が一元方程式のみを対象としていたのに対し、複数の未知数を必要とする連立方程式に関する数式の表現と解法を編み出した点は、後代の和算家らに影響を与えたと言える.
+            </p>
+            <p>
+                『<input class="blank" data-ans="発微算法" style="width:100px">』を批判する書物が現れたため、その解法を詳細に記述した解説書である『<input
+                    class="blank" data-ans="発微算法" style="width:100px">演段諺解』が、1685年に高弟の<input class="blank"
+                    data-ans="建部賢弘" style="width:100px">により刊行された.これにより<input class="blank" data-ans="傍書法"
+                    style="width:80px">が広く普及することとなった.
+            </p>
+            <div class="section-controls">
+                <button class="btn-mini btn-check" onclick="checkSection(this)">このセクションを採点</button>
+                <button class="btn-mini btn-ans" onclick="showSectionAns(this)">答えを見る</button>
+                <button class="btn-mini btn-reset" onclick="resetSection(this)">リセット</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.switchSheet = function switchSheet(n) {
+            document.querySelectorAll('.sheet').forEach(el => el.classList.remove('active'));
+            document.getElementById(`sheet-${n}`).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn')[n - 1].classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputs = document.querySelectorAll('input.blank');
+            inputs.forEach(input => {
+                const wrapper = document.createElement('span');
+                wrapper.className = 'input-wrapper';
+                input.parentNode.insertBefore(wrapper, input);
+                wrapper.appendChild(input);
+
+                const tooltip = document.createElement('div');
+                tooltip.className = 'ans-tooltip';
+                tooltip.innerText = input.dataset.ans.split('|')[0];
+                wrapper.appendChild(tooltip);
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        // Scope navigation to current section
+                        const currentSection = input.closest('.quiz-section');
+                        const sectionInputs = Array.from(currentSection.querySelectorAll('input.blank'));
+                        const idx = sectionInputs.indexOf(input);
+                        if (idx >= 0 && idx < sectionInputs.length - 1) {
+                            sectionInputs[idx + 1].focus();
+                        }
+                    }
+                });
+
+                input.addEventListener('input', () => {
+                    input.classList.remove('correct', 'incorrect');
+                    wrapper.classList.remove('show-ans');
+                });
+            });
+        });
+
+        window.checkSection = function checkSection(btn) {
+            const section = btn.closest('.quiz-section');
+            const inputs = section.querySelectorAll('input.blank');
+
+            inputs.forEach(input => {
+                const val = input.value.trim().replace(/\s+/g, '');
+                const answers = input.dataset.ans.split('|');
+                const isMatch = answers.some(ans => {
+                    return val === ans || val === ans.replace(/・/g, '');
+                });
+
+                if (isMatch) {
+                    input.classList.add('correct');
+                    input.classList.remove('incorrect');
+                    input.parentElement.classList.remove('show-ans');
+                } else {
+                    input.classList.add('incorrect');
+                    input.classList.remove('correct');
+                }
+            });
+        };
+
+        window.showSectionAns = function showSectionAns(btn) {
+            const section = btn.closest('.quiz-section');
+            const inputs = section.querySelectorAll('input.blank');
+            inputs.forEach(input => {
+                if (!input.classList.contains('correct')) {
+                    input.parentElement.classList.add('show-ans');
+                    input.classList.add('incorrect');
+                }
+            });
+        };
+
+        window.resetSection = function resetSection(btn) {
+            if (confirm("このセクションをリセットしますか？")) {
+                const section = btn.closest('.quiz-section');
+                const inputs = section.querySelectorAll('input.blank');
+                inputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('correct', 'incorrect');
+                    input.parentElement.classList.remove('show-ans');
+                });
+            }
+        };
+    </script>
+
+</body>
+
+</html>

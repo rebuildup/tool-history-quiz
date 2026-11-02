@@ -2,6 +2,10 @@
 
 import { useEffect, useRef } from "react";
 
+// Ordered by preference: package-owned asset first, host-served fallback
+// second. See `loadHtml` for the rationale.
+const CONTENT_URLS = ["./history-quiz.html", "/history-quiz.html"];
+
 export default function HistoryQuizApp() {
 	const containerRef = useRef<HTMLDivElement>(null);
 
@@ -17,16 +21,36 @@ export default function HistoryQuizApp() {
 			inputListener: () => void;
 		}> = [];
 
+		// The quiz markup is owned by this package and shipped next to the
+		// standalone build (`public/history-quiz.html` -> `dist/history-quiz.html`),
+		// so the relative URL resolves correctly when the artifact is served
+		// from a host sub-path. The absolute path stays as a fallback for the
+		// parent monorepo embed, where the file is served from the host root.
+		const loadHtml = async (): Promise<string | null> => {
+			for (const url of CONTENT_URLS) {
+				if (controller.signal.aborted) return null;
+				try {
+					const res = await fetch(url, { signal: controller.signal });
+					if (!res.ok) continue;
+					return await res.text();
+				} catch (err) {
+					if ((err as Error).name === "AbortError") throw err;
+					// Try the next candidate URL.
+				}
+			}
+			return null;
+		};
+
 		const setupInputListeners = () => {
 			if (!containerRef.current) return;
 			const inputs = Array.from(
 				containerRef.current.querySelectorAll("input.blank"),
 			) as HTMLInputElement[];
-			inputs.forEach((input) => {
+			for (const input of inputs) {
 				const wrapper = document.createElement("span");
 				wrapper.className = "input-wrapper";
 				const parent = input.parentNode;
-				if (!parent) return;
+				if (!parent) continue;
 				parent.insertBefore(wrapper, input);
 				wrapper.appendChild(input);
 
@@ -63,7 +87,7 @@ export default function HistoryQuizApp() {
 				};
 				input.addEventListener("input", inputListener);
 				inputListeners.push({ input, keydown, inputListener });
-			});
+			}
 		};
 
 		const applyHtml = (html: string) => {
@@ -96,11 +120,12 @@ export default function HistoryQuizApp() {
 
 		(async () => {
 			try {
-				const res = await fetch("/history-quiz.html", {
-					signal: controller.signal,
-				});
-				const html = await res.text();
+				const html = await loadHtml();
 				if (controller.signal.aborted) return;
+				if (html === null) {
+					console.error("Failed to load HTML: no candidate URL succeeded");
+					return;
+				}
 				applyHtml(html);
 			} catch (err) {
 				if ((err as Error).name === "AbortError") return;
@@ -110,10 +135,10 @@ export default function HistoryQuizApp() {
 
 		return () => {
 			controller.abort();
-			inputListeners.forEach(({ input, keydown, inputListener }) => {
+			for (const { input, keydown, inputListener } of inputListeners) {
 				input.removeEventListener("keydown", keydown);
 				input.removeEventListener("input", inputListener);
-			});
+			}
 			inputListeners = [];
 			styleElement?.remove();
 			scriptElement?.remove();
