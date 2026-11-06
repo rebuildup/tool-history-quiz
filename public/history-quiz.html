@@ -115,6 +115,20 @@
             background-color: #fdedec;
         }
 
+        /*
+         * The answer blanks carry a hand-tuned `width` inline style
+         * (measured at the pinned content: 426 inputs, up to 720px, 53 of
+         * them over 300px). Inside a 390px frame a 360px+ blank pushes
+         * the document to `scrollWidth` 543 and the underline runs past
+         * the card into the host gutter, so the inline width is clamped
+         * to the available line and the blank grows to fit instead
+         * (my-web-2026#910). Desktop is unchanged: 100% of an inline-block
+         * inside a text line is the blank's own content width.
+         */
+        input.blank {
+            max-width: 100%;
+        }
+
         /* Tooltip */
         .ans-tooltip {
             position: absolute;
