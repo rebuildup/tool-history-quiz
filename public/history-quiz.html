@@ -120,12 +120,25 @@
          * (measured at the pinned content: 426 inputs, up to 720px, 53 of
          * them over 300px). Inside a 390px frame a 360px+ blank pushes
          * the document to `scrollWidth` 543 and the underline runs past
-         * the card into the host gutter, so the inline width is clamped
-         * to the available line and the blank grows to fit instead
-         * (my-web-2026#910). Desktop is unchanged: 100% of an inline-block
-         * inside a text line is the blank's own content width.
+         * the card into the host gutter (my-web-2026#910).
+         *
+         * Clamping the input alone does NOT work: `max-width: 100%`
+         * resolves against the `span.input-wrapper`, which is an
+         * inline-block that sizes to the input's own inline width, so the
+         * percentage is circular and the blank keeps its 480px. The
+         * wrapper is the element that has to shrink, so it gets
+         * `max-width: calc(100vw - 40px)` (the body's own 20px side
+         * padding) and the input fills it with `width: auto` — the
+         * hand-tuned inline width is overridden by the higher-specificity
+         * clamp below. Desktop is unchanged: the wrapper is wide enough
+         * that the clamp never engages below 760px.
          */
-        input.blank {
+        .input-wrapper {
+            max-width: calc(100vw - 40px);
+        }
+
+        .input-wrapper input.blank {
+            width: auto;
             max-width: 100%;
         }
 
